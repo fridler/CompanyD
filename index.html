@@ -11,8 +11,11 @@
   <body>
     <div class="main-container col-12 col-lg-10">
       <h1 class="text-center mb-4">פלוגה ד'</h1>
-      <h3 class="mb-3">טלפונים חשובים</h3>
-      <div class="important-phones mb-4">
+      <button class="important-phones-toggle mb-3" onclick="toggleImportantPhones()">
+        <h3 class="mb-0 d-inline">טלפונים חשובים</h3>
+        <i class="fas fa-chevron-down toggle-icon ms-2"></i>
+      </button>
+      <div class="important-phones mb-4 collapsed">
         <div class="phone-item">
           <span class="phone-name">משתלט</span>
           <span class="phone-cell">
@@ -58,16 +61,8 @@
       </div>
       <div id="errorMessage" class="alert alert-danger d-none mb-3" role="alert">שגיאה בטעינת הנתונים. אנא ודא שה-URL של Google Apps Script תקין.</div>
       <div class="row mb-3">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
+        <div class="col-12">
           <input id="searchInput" type="text" class="form-control" placeholder="חפש..." oninput="filterEmployees()" />
-        </div>
-        <div class="col-12 col-md-6">
-          <select id="columnSelect" class="form-select" onchange="filterEmployees()">
-            <option value="all">כל העמודות</option>
-            <option value="name">שם</option>
-            <option value="phone">טלפון</option>
-            <option value="department">מחלקה</option>
-          </select>
         </div>
       </div>
       <div class="table-responsive">
