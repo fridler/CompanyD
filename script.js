@@ -36,20 +36,26 @@ function renderEmployees(employees) {
 
 function filterEmployees() {
   const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-  const column = document.getElementById("columnSelect").value;
-
   const filteredEmployees = allEmployees.filter((employee) => {
-    if (column === "all") {
-      const name = (employee.name || "").toString().toLowerCase();
-      const phone = (employee.phone || "").toString().toLowerCase();
-      const department = (employee.department || "").toString().toLowerCase();
-      return name.includes(searchTerm) || phone.includes(searchTerm) || department.includes(searchTerm);
-    } else {
-      const value = (employee[column] || "").toString().toLowerCase();
-      return value.includes(searchTerm);
-    }
+    const name = (employee.name || "").toString().toLowerCase();
+    const phone = (employee.phone || "").toString().toLowerCase();
+    const department = (employee.department || "").toString().toLowerCase();
+    return name.includes(searchTerm) || phone.includes(searchTerm) || department.includes(searchTerm);
   });
   renderEmployees(filteredEmployees);
+}
+
+function toggleImportantPhones() {
+  const phonesList = document.querySelector(".important-phones");
+  const toggleIcon = document.querySelector(".toggle-icon");
+  phonesList.classList.toggle("collapsed");
+  if (phonesList.classList.contains("collapsed")) {
+    toggleIcon.classList.remove("fa-chevron-up");
+    toggleIcon.classList.add("fa-chevron-down");
+  } else {
+    toggleIcon.classList.remove("fa-chevron-down");
+    toggleIcon.classList.add("fa-chevron-up");
+  }
 }
 
 // טען נתונים מיד עם טעינת הדף
