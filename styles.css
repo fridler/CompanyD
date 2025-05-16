@@ -34,6 +34,9 @@ body {
 .important-phones {
   margin-bottom: 1rem;
 }
+.important-phones.collapsed {
+  display: none;
+}
 .phone-item {
   display: flex;
   justify-content: space-between;
@@ -43,4 +46,20 @@ body {
 }
 .phone-name {
   flex: 1;
+}
+.important-phones-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+.important-phones-toggle:hover {
+  color: #007bff;
+}
+.toggle-icon {
+  font-size: 1rem;
 }
