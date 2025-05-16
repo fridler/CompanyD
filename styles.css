@@ -1,0 +1,46 @@
+body {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+}
+.main-container {
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.table-responsive {
+  margin-bottom: 1rem;
+}
+.phone-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.phone-cell a {
+  text-decoration: none;
+  color: #007bff;
+}
+.phone-cell a:hover {
+  text-decoration: underline;
+}
+.phone-cell .whatsapp-icon {
+  color: #25d366;
+  font-size: 1.2rem;
+}
+.important-phones {
+  margin-bottom: 1rem;
+}
+.phone-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+.phone-name {
+  flex: 1;
+}
