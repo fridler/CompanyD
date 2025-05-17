@@ -1,9 +1,46 @@
 let allEmployees = [];
+let importantPhones = [];
+
+async function loadImportantPhones() {
+  const phonesList = document.getElementById("importantPhonesList");
+  phonesList.classList.add("loading");
+  try {
+    // החלף ב-URL של ה-Web app של Google Apps Script עבור טלפונים חשובים
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzG1VtX8gSt9-r032T3bJQyBTSujKy_xV74b0t8eebDyAnk3zhBrtJqFVR7Xd5wUPll/exec?type=important_phones");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    importantPhones = await response.json();
+    phonesList.classList.remove("loading");
+    renderImportantPhones(importantPhones);
+  } catch (error) {
+    console.error("Error loading important phones:", error);
+    phonesList.classList.remove("loading");
+    document.getElementById("errorMessage").classList.remove("d-none");
+  }
+}
+
+function renderImportantPhones(phones) {
+  const phonesList = document.getElementById("importantPhonesList");
+  phonesList.innerHTML = "";
+  phones.forEach((phone) => {
+    const phoneItem = document.createElement("div");
+    phoneItem.className = "phone-item";
+    const phoneNumber = (phone.phone || "").replace(/[^0-9]/g, ""); // הסרת תווים לא מספריים עבור tel
+    phoneItem.innerHTML = `
+            <span class="phone-name">${phone.name || ""}</span>
+            <span class="phone-cell">
+                ${phoneNumber ? `<a href="tel:${phoneNumber}">${phone.phone}</a>` : phone.phone || ""}
+            </span>
+        `;
+    phonesList.appendChild(phoneItem);
+  });
+}
 
 async function loadEmployees() {
   try {
-    // החלף ב-URL של ה-Web app של Google Apps Script עבור קריאת נתונים
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwmasQqmH4m_V-39R6GPVTKhYsZvgCyyT2HesbW-PdUrVb1YVgK6AuC9_Ly704P856F/exec");
+    // החלף ב-URL של ה-Web app של Google Apps Script עבור עובדים
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzG1VtX8gSt9-r032T3bJQyBTSujKy_xV74b0t8eebDyAnk3zhBrtJqFVR7Xd5wUPll/exec?type=employees");
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -59,4 +96,4 @@ function toggleImportantPhones() {
 }
 
 // טען נתונים מיד עם טעינת הדף
-loadEmployees();
+Promise.all([loadEmployees(), loadImportantPhones()]);
