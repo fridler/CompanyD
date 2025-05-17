@@ -9,13 +9,17 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+    <div id="offlineMessage" class="alert alert-warning d-none mb-3" role="alert">מצב לא מקוון: מוצגים נתונים ממטמון</div>
     <div class="main-container col-12 col-lg-10">
       <h1 class="text-center mb-4">פלוגה ד'</h1>
       <button class="important-phones-toggle mb-3" onclick="toggleImportantPhones()">
         <h3 class="mb-0 d-inline">טלפונים חשובים</h3>
         <i class="fas fa-chevron-down toggle-icon ms-2"></i>
       </button>
-      <div id="importantPhonesList" class="important-phones mb-4 collapsed loading"></div>
+      <div id="importantPhonesList" class="important-phones mb-4 collapsed"></div>
       <div id="errorMessage" class="alert alert-danger d-none mb-3" role="alert">שגיאה בטעינת הנתונים. אנא ודא שה-URL של Google Apps Script תקין.</div>
       <div class="row mb-3">
         <div class="col-12">
@@ -26,9 +30,9 @@
         <table class="table table-bordered table-hover">
           <thead class="table-light">
             <tr>
-              <th>שם</th>
-              <th>טלפון</th>
-              <th>מחלקה</th>
+              <th onclick="sortTable('name')" style="cursor: pointer">שם <span class="sort-icon"></span></th>
+              <th onclick="sortTable('phone')" style="cursor: pointer">טלפון <span class="sort-icon"></span></th>
+              <th onclick="sortTable('department')" style="cursor: pointer">מחלקה <span class="sort-icon"></span></th>
             </tr>
           </thead>
           <tbody id="employeeTable"></tbody>
