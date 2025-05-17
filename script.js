@@ -14,7 +14,6 @@ async function loadImportantPhones() {
       throw new Error("Network response was not ok");
     }
     importantPhones = await response.json();
-    localStorage.setItem("importantPhones", JSON.stringify(importantPhones));
     renderImportantPhones(importantPhones);
   } catch (error) {
     console.error("Error loading important phones:", error);
@@ -47,9 +46,8 @@ async function loadEmployees() {
       throw new Error("Network response was not ok");
     }
     allEmployees = await response.json();
-    localStorage.setItem("allEmployees", JSON.stringify(allEmployees));
     renderEmployees(sortEmployees(allEmployees));
-    updateSortIcons(); // עדכון חץ המיון לאחר טעינה ראשונית
+    updateSortIcons();
   } catch (error) {
     console.error("Error loading employees:", error);
     document.getElementById("errorMessage").classList.remove("d-none");
@@ -135,34 +133,14 @@ function toggleImportantPhones() {
 
 async function loadAllData() {
   const loadingOverlay = document.getElementById("loadingOverlay");
-  const offlineMessage = document.getElementById("offlineMessage");
   loadingOverlay.classList.add("active");
   try {
     await Promise.all([loadEmployees(), loadImportantPhones()]);
-    offlineMessage.classList.add("d-none");
   } catch (error) {
-    const cachedEmployees = JSON.parse(localStorage.getItem("allEmployees") || "[]");
-    const cachedPhones = JSON.parse(localStorage.getItem("importantPhones") || "[]");
-    if (cachedEmployees.length > 0 || cachedPhones.length > 0) {
-      allEmployees = cachedEmployees;
-      importantPhones = cachedPhones;
-      renderEmployees(sortEmployees(allEmployees));
-      renderImportantPhones(importantPhones);
-      offlineMessage.classList.remove("d-none");
-    }
+    // הצגת הודעת שגיאה כבר מטופלת בפונקציות loadEmployees ו-loadImportantPhones
   } finally {
     loadingOverlay.classList.remove("active");
   }
-}
-
-// רישום Service Worker
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((registration) => console.log("Service Worker registered"))
-      .catch((error) => console.error("Service Worker registration failed:", error));
-  });
 }
 
 loadAllData();
