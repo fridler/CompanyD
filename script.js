@@ -1,22 +1,25 @@
 let allEmployees = [];
 let importantPhones = [];
+let sortColumn = "name";
+let sortDirection = "asc";
+
+const BASE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzG1VtX8gSt9-r032T3bJQyBTSujKy_xV74b0t8eebDyAnk3zhBrtJqFVR7Xd5wUPll/exec";
+const IMPORTANT_PHONES_URL = `${BASE_APPS_SCRIPT_URL}?type=important_phones`;
+const EMPLOYEES_URL = `${BASE_APPS_SCRIPT_URL}?type=employees`;
 
 async function loadImportantPhones() {
-  const phonesList = document.getElementById("importantPhonesList");
-  phonesList.classList.add("loading");
   try {
-    // החלף ב-URL של ה-Web app של Google Apps Script עבור טלפונים חשובים
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzG1VtX8gSt9-r032T3bJQyBTSujKy_xV74b0t8eebDyAnk3zhBrtJqFVR7Xd5wUPll/exec?type=important_phones");
+    const response = await fetch(IMPORTANT_PHONES_URL);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     importantPhones = await response.json();
-    phonesList.classList.remove("loading");
+    localStorage.setItem("importantPhones", JSON.stringify(importantPhones));
     renderImportantPhones(importantPhones);
   } catch (error) {
     console.error("Error loading important phones:", error);
-    phonesList.classList.remove("loading");
     document.getElementById("errorMessage").classList.remove("d-none");
+    throw error;
   }
 }
 
@@ -26,7 +29,7 @@ function renderImportantPhones(phones) {
   phones.forEach((phone) => {
     const phoneItem = document.createElement("div");
     phoneItem.className = "phone-item";
-    const phoneNumber = (phone.phone || "").replace(/[^0-9]/g, ""); // הסרת תווים לא מספריים עבור tel
+    const phoneNumber = (phone.phone || "").replace(/[^0-9]/g, "");
     phoneItem.innerHTML = `
             <span class="phone-name">${phone.name || ""}</span>
             <span class="phone-cell">
@@ -39,16 +42,18 @@ function renderImportantPhones(phones) {
 
 async function loadEmployees() {
   try {
-    // החלף ב-URL של ה-Web app של Google Apps Script עבור עובדים
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzG1VtX8gSt9-r032T3bJQyBTSujKy_xV74b0t8eebDyAnk3zhBrtJqFVR7Xd5wUPll/exec?type=employees");
+    const response = await fetch(EMPLOYEES_URL);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     allEmployees = await response.json();
-    renderEmployees(allEmployees);
+    localStorage.setItem("allEmployees", JSON.stringify(allEmployees));
+    renderEmployees(sortEmployees(allEmployees));
+    updateSortIcons(); // עדכון חץ המיון לאחר טעינה ראשונית
   } catch (error) {
     console.error("Error loading employees:", error);
     document.getElementById("errorMessage").classList.remove("d-none");
+    throw error;
   }
 }
 
@@ -57,8 +62,8 @@ function renderEmployees(employees) {
   tableBody.innerHTML = "";
   employees.forEach((employee) => {
     const row = document.createElement("tr");
-    const phone = (employee.phone || "").replace(/[^0-9]/g, ""); // הסרת תווים לא מספריים
-    const whatsappPhone = phone ? `+972${phone.replace(/^0/, "")}` : ""; // הוספת +972 והסרת 0 מתחילת המספר
+    const phone = (employee.phone || "").replace(/[^0-9]/g, "");
+    const whatsappPhone = phone ? `+972${phone.replace(/^0/, "")}` : "";
     row.innerHTML = `
             <td>${employee.name || ""}</td>
             <td class="phone-cell">
@@ -79,7 +84,40 @@ function filterEmployees() {
     const department = (employee.department || "").toString().toLowerCase();
     return name.includes(searchTerm) || phone.includes(searchTerm) || department.includes(searchTerm);
   });
-  renderEmployees(filteredEmployees);
+  renderEmployees(sortEmployees(filteredEmployees));
+}
+
+function sortTable(column) {
+  if (sortColumn === column) {
+    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = column;
+    sortDirection = "asc";
+  }
+  updateSortIcons();
+  renderEmployees(sortEmployees(allEmployees));
+}
+
+function sortEmployees(employees) {
+  return [...employees].sort((a, b) => {
+    const valueA = (a[sortColumn] || "").toString().toLowerCase();
+    const valueB = (b[sortColumn] || "").toString().toLowerCase();
+    if (sortDirection === "asc") {
+      return valueA.localeCompare(valueB);
+    } else {
+      return valueB.localeCompare(valueA);
+    }
+  });
+}
+
+function updateSortIcons() {
+  document.querySelectorAll(".sort-icon").forEach((icon) => {
+    icon.classList.remove("asc", "desc");
+  });
+  const activeIcon = document.querySelector(`th[onclick="sortTable('${sortColumn}')"] .sort-icon`);
+  if (activeIcon) {
+    activeIcon.classList.add(sortDirection);
+  }
 }
 
 function toggleImportantPhones() {
@@ -95,5 +133,36 @@ function toggleImportantPhones() {
   }
 }
 
-// טען נתונים מיד עם טעינת הדף
-Promise.all([loadEmployees(), loadImportantPhones()]);
+async function loadAllData() {
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  const offlineMessage = document.getElementById("offlineMessage");
+  loadingOverlay.classList.add("active");
+  try {
+    await Promise.all([loadEmployees(), loadImportantPhones()]);
+    offlineMessage.classList.add("d-none");
+  } catch (error) {
+    const cachedEmployees = JSON.parse(localStorage.getItem("allEmployees") || "[]");
+    const cachedPhones = JSON.parse(localStorage.getItem("importantPhones") || "[]");
+    if (cachedEmployees.length > 0 || cachedPhones.length > 0) {
+      allEmployees = cachedEmployees;
+      importantPhones = cachedPhones;
+      renderEmployees(sortEmployees(allEmployees));
+      renderImportantPhones(importantPhones);
+      offlineMessage.classList.remove("d-none");
+    }
+  } finally {
+    loadingOverlay.classList.remove("active");
+  }
+}
+
+// רישום Service Worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => console.log("Service Worker registered"))
+      .catch((error) => console.error("Service Worker registration failed:", error));
+  });
+}
+
+loadAllData();
