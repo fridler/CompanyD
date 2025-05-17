@@ -33,9 +33,22 @@ body {
 }
 .important-phones {
   margin-bottom: 1rem;
+  max-height: 500px; /* גובה מקסימלי למניעת גלילה מיותרת */
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
 }
 .important-phones.collapsed {
-  display: none;
+  max-height: 0;
+}
+.important-phones.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
+.important-phones.loading .spinner-border {
+  width: 24px;
+  height: 24px;
 }
 .phone-item {
   display: flex;
