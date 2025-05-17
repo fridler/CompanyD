@@ -33,22 +33,12 @@ body {
 }
 .important-phones {
   margin-bottom: 1rem;
-  max-height: 500px; /* גובה מקסימלי למניעת גלילה מיותרת */
+  max-height: 500px;
   overflow: hidden;
   transition: max-height 0.3s ease-in-out;
 }
 .important-phones.collapsed {
   max-height: 0;
-}
-.important-phones.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50px;
-}
-.important-phones.loading .spinner-border {
-  width: 24px;
-  height: 24px;
 }
 .phone-item {
   display: flex;
@@ -75,4 +65,46 @@ body {
 }
 .toggle-icon {
   font-size: 1rem;
+}
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.loading-overlay:not(.active) {
+  display: none;
+}
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.sort-icon.asc::after {
+  content: "↑";
+  margin-right: 5px;
+}
+.sort-icon.desc::after {
+  content: "↓";
+  margin-right: 5px;
+}
+th:hover {
+  background-color: #e9ecef;
 }
